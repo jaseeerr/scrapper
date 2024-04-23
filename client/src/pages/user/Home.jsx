@@ -88,7 +88,7 @@ function WebsiteScraper() {
               {[['JS Files', assets.jsFiles], ['CSS Files', assets.cssFiles], ['Images', assets.images]].map(([label, files], idx) => (
                 <div key={idx} className="mt-4">
                   <strong>{label}:</strong>
-                  <ul className="list-none pl-5 space-y-2">
+                  <ul className="list-decimal pl-5 space-y-2">
                     {files.map((file, index) => (
                       <li key={index} className="break-all">
                         <a href={file} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 underline">

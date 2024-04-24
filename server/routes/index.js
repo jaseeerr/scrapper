@@ -10,8 +10,8 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-/* GET home page. */
-router.post('/scan', async function(req, res, next) {
+/* GET Scan V OLD page. */
+router.post('/scanold', async function(req, res, next) {
 
 
   async function performVulnerabilityScan(url) {
@@ -61,6 +61,84 @@ router.post('/scan', async function(req, res, next) {
     }
   
     return results;
+  }
+
+  const data = await performVulnerabilityScan(req.body.url)
+  console.log(data)
+  res.json({data,success:true})
+
+});
+
+/* GET Scan V page. */
+router.post('/scan', async function(req, res, next) {
+
+
+  async function performVulnerabilityScan(url) {
+    const results = [];
+    const agent = new https.Agent({
+      rejectUnauthorized: false // Allows checking of insecure SSL/TLS configurations
+    });
+  
+    try {
+      const response = await axios.get(url, { httpsAgent: agent });
+  
+      // Check for Security Headers
+      checkSecurityHeaders(response.headers, results);
+  
+      // SSL/TLS Configuration
+      checkSSLCertificate(response.request.socket, results);
+  
+      // Common Files and Directories Exposure
+      await checkCommonPathsExposure(url, results);
+  
+    } catch (error) {
+      results.push({ description: `Failed to fetch URL: ${url}. Error: ${error.message}` });
+    }
+  
+    return results;
+  }
+  
+  function checkSecurityHeaders(headers, results) {
+    const requiredHeaders = {
+      'x-frame-options': 'X-Frame-Options',
+      'content-security-policy': 'Content-Security-Policy',
+      'x-content-type-options': 'X-Content-Type-Options',
+      'strict-transport-security': 'Strict-Transport-Security'
+    };
+  
+    for (const header in requiredHeaders) {
+      if (!headers[header]) {
+        results.push({ description: `Missing ${requiredHeaders[header]} header.` });
+      }
+    }
+  }
+  
+  function checkSSLCertificate(socket, results) {
+    if (socket) {
+      const cert = socket.getPeerCertificate();
+      if (cert) {
+        if (new Date(cert.valid_to) < new Date()) {
+          results.push({ description: 'SSL/TLS certificate expired.' });
+        }
+        if (cert.bits < 2048) {
+          results.push({ description: 'SSL/TLS certificate uses weak encryption (less than 2048 bits).' });
+        }
+      }
+    }
+  }
+  
+  async function checkCommonPathsExposure(url, results) {
+    const commonPaths = ['/admin', '/login', '/.git', '/wp-admin'];
+    for (let path of commonPaths) {
+      try {
+        const pathResponse = await axios.get(`${url}${path}`, { httpsAgent: new https.Agent({ rejectUnauthorized: false }) });
+        if (pathResponse.status === 200) {
+          results.push({ description: `Sensitive directory or file exposed: ${path}` });
+        }
+      } catch (error) {
+        // Ignore errors as these indicate non-existence which is good
+      }
+    }
   }
 
   const data = await performVulnerabilityScan(req.body.url)

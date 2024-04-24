@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom"
 import Store from "./utils/store";
 
 import WebsiteScraper from "./pages/user/Home";
+import MusicPlayer from "./pages/user/Music";
 
 
 
@@ -33,6 +34,10 @@ const appRouter = createBrowserRouter([
             {
                 path: "/",
                 element: <WebsiteScraper />
+            },
+            {
+                path: "/music",
+                element: <MusicPlayer />
             },
            
           

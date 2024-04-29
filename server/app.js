@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   cors({
-    origin: '*',
+    origin: 'https://chitchat.website',
     methods: ['GET', 'POST', 'PUT', 'PATCH'],
     credentials: true,  
   })

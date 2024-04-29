@@ -3,8 +3,9 @@ var router = express.Router();
 const puppeteer = require('puppeteer');
 const axios = require('axios');
 const https = require('https');
-
-
+const ffmpeg = require('fluent-ffmpeg');
+const youtubeDl = require('youtube-dl-exec');
+ffmpeg.setFfmpegPath("C:\\ffmpeg\\bin\\ffmpeg.exe");
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -189,6 +190,38 @@ router.post('/scrape', function(req, res, next) {
     console.log("Data fetched");
   res.json({data:details, success:true})
 });
+});
+
+/* GET Audio data. */
+router.post('/getAudio', async function(req, res, next) {
+  
+
+  const { url } = req.body;
+  try {
+      const videoInfo = await youtubeDl(url, {
+          dumpSingleJson: true,
+          noPlaylist: true,
+      });
+
+      // Set response headers for audio streaming
+      res.contentType('audio/mpeg');
+
+      // Use fluent-ffmpeg to process the video URL directly and stream audio
+      ffmpeg({ source: videoInfo.url })
+          .audioCodec('libmp3lame')
+          .toFormat('mp3')
+          .on('error', (err) => {
+              console.error('An error occurred:', err.message);
+              res.status(500).send('Error processing audio');
+          })
+          .on('end', () => {
+              console.log('Audio conversion finished.');
+          })
+          .pipe(res, { end: true });  // Pipe the output directly to the response object
+  } catch (error) {
+      console.error('Error processing your request:', error);
+      res.status(500).json({ message: 'Error processing your request' });
+  }
 });
 
 module.exports = router;

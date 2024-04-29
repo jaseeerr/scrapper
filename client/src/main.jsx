@@ -5,6 +5,7 @@ import Store from "./utils/store";
 
 import WebsiteScraper from "./pages/user/Home";
 import MusicPlayer from "./pages/user/Music";
+import DownloadAudioPage from "./pages/user/AddMusic";
 
 
 
@@ -38,6 +39,10 @@ const appRouter = createBrowserRouter([
             {
                 path: "/music",
                 element: <MusicPlayer />
+            },
+            {
+                path: "/addMusic",
+                element: <DownloadAudioPage />
             },
            
           

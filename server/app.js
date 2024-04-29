@@ -23,7 +23,7 @@ app.use(
   cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH'],
-    // credentials: true,
+    credentials: true,  
   })
 ); 
 app.use('/', indexRouter);

@@ -13,11 +13,14 @@
     "dotenv": "^16.4.5",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
+    "fluent-ffmpeg": "^2.1.2",
     "http-errors": "~1.6.3",
     "mongoose": "^8.3.2",
     "morgan": "~1.9.1",
     "nodemon": "^3.1.0",
     "puppeteer": "^22.6.5",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "youtube-dl-exec": "^3.0.0",
+    "yt-dlp-wrap": "^2.3.12"
   }
 }

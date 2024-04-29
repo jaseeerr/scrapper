@@ -7,7 +7,7 @@ import song3 from "../../assets/song3.mp3"
 import { SOCKET_URL } from '../../config/url';
 
 // Connect to the Socket.IO server
-const socket = io(`${SOCKET_URL}`);
+// const socket = io(`${SOCKET_URL}`);
 
 const MusicPlayer = () => {
   const tracks = [
@@ -20,60 +20,57 @@ const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);  // Create a ref for the audio player
 
-  useEffect(() => {
-    socket.on('track', (index) => {
-      setCurrentTrackIndex(index);
-      setIsPlaying(true);
-      changePlaying()
-    //   document.getElementById('playBtn').click()
-    });
+  // useEffect(() => {
+  //   socket.on('track', (index) => {
+  //     setCurrentTrackIndex(index);
+  //     setIsPlaying(true);
+  //     changePlaying()
+  //   });
 
-    return () => socket.off('track');
-  }, []);
+  //   return () => socket.off('track');
+  // }, []);
 
-  useEffect(() => {
-    socket.on('pause', () => {
-      setIsPlaying(false);
-    //   document.getElementById('playBtn').click()
-    });
+  // useEffect(() => {
+  //   socket.on('pause', () => {
+  //     setIsPlaying(false);
+  //   });
 
-    return () => socket.off('pause');
-  }, []);
+  //   return () => socket.off('pause');
+  // }, []);
 
-  useEffect(() => {
-    socket.on('play', () => {
-      setIsPlaying(true);
-    //   document.getElementById('playBtn').click()
-    });
+  // useEffect(() => {
+  //   socket.on('play', () => {
+  //     setIsPlaying(true);
+  //   });
 
-    return () => socket.off('play');
-  }, []);
+  //   return () => socket.off('play');
+  // }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
     
-    if (audioRef.current) {
-      isPlaying ? audioRef.current.audioEl.current.play() : audioRef.current.audioEl.current.pause();
+  //   if (audioRef.current) {
+  //     isPlaying ? audioRef.current.audioEl.current.play() : audioRef.current.audioEl.current.pause();
 
-    }
-  }, [isPlaying, currentTrackIndex]); // React on isPlaying and track change
+  //   }
+  // }, [isPlaying, currentTrackIndex]); 
 
 
 
-  const changeTrack = (index) => {
-    socket.emit('changeTrack', index);
-  };
+  // const changeTrack = (index) => {
+  //   socket.emit('changeTrack', index);
+  // };
 
-  const nextTrack = () => {
-    changeTrack((currentTrackIndex + 1) % tracks.length);
-  };
+  // const nextTrack = () => {
+  //   changeTrack((currentTrackIndex + 1) % tracks.length);
+  // };
 
-  const prevTrack = () => {
-    changeTrack((currentTrackIndex - 1 + tracks.length) % tracks.length);
-  };
+  // const prevTrack = () => {
+  //   changeTrack((currentTrackIndex - 1 + tracks.length) % tracks.length);
+  // };
 
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
+  // const togglePlayPause = () => {
+  //   setIsPlaying(!isPlaying);
+  // };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-800 text-white p-4">

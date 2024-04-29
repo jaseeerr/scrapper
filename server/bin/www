@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('server:server');
 var http = require('http');
-const setupSocketIO = require('../socket/socketio');
+// const setupSocketIO = require('../socket/socketio');
 
 
 /**
@@ -23,7 +23,7 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-setupSocketIO(server); 
+// setupSocketIO(server); 
 
 /**
  * Listen on provided port, on all network interfaces.

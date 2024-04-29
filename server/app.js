@@ -3,10 +3,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const cors = require('cors')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+
+
+
+const cors = require('cors')
 
 var app = express();
 
@@ -26,6 +29,7 @@ app.use(
     credentials: true,  
   })
 ); 
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 

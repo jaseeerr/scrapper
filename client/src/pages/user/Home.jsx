@@ -6,9 +6,12 @@ function WebsiteScraper() {
   const [url, setUrl] = useState('');
   const [assets, setAssets] = useState(null);
   const [scanResult,setScanResult] = useState([])
+  const [finalUrl,setFinalUrl] = useState(null)
 
   const handleScrape = async () => {
     try {
+       
+        await scanV()
         toast.loading("Scaning for assets")
       const response = await axios.post(`${SERVER_URL}/scrape`, { url }); // Ensure you send the URL
       console.log(response);
@@ -23,7 +26,7 @@ function WebsiteScraper() {
         toast.error("Error")
       console.error('Error during fetch:', error);
     }
-    scanV()
+    
   };
 
   const scanV = async ()=>{
@@ -34,6 +37,7 @@ function WebsiteScraper() {
         toast.dismiss()
         if (response.data.success) {
           setScanResult(response.data.data);
+          setFinalUrl(response.data.finalUrl)
         } else {
           console.error('Failed to fetch assets');
         }
@@ -73,11 +77,20 @@ function WebsiteScraper() {
             <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Vulnerability Scan Results</h2>
               <ul className="list-disc pl-5 space-y-2">
+              {finalUrl && 
+                 <li className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 overflow-hidden text-ellipsis whitespace-nowrap ">
+                  Final URL : <br />
+                <span className='text-xs'>
+                {finalUrl}
+                </span>
+               </li>
+                }
                 {scanResult.map((result, index) => (
                   <li key={index} className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
                     {result.description}
                   </li>
                 ))}
+                
               </ul>
             </div>
           )}

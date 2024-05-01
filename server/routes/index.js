@@ -74,6 +74,41 @@ router.post('/scanold', async function(req, res, next) {
 router.post('/scan', async function(req, res, next) {
 
 
+  async function followRedirects(url, visited = []) {
+    try {
+        const response = await axios.get(url, {
+            maxRedirects: 5, // Disable automatic redirects
+            validateStatus: status => status < 400,
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+          } // Accept all status codes under 400
+        });
+        // If no redirect, return the final URL and the chain
+        return {
+            finalUrl: response.request.res.responseUrl || url,
+            visited
+        };
+    } catch (error) {
+        if (error.response && (error.response.status === 301 || error.response.status === 302)) {
+            const location = error.response.headers.location;
+            visited.push({
+                url: url,
+                redirectTo: location,
+                status: error.response.status
+            });
+            return followRedirects(location, visited); // Recursively follow redirects
+        } else {
+            // Return the error if it's not a redirect
+            return {
+                error: "Failed to fetch URL",
+                details: error.message,
+                visited
+            };
+        }
+    }
+}
+
+
   async function performVulnerabilityScan(url) {
     const results = [];
     const agent = new https.Agent({
@@ -143,16 +178,28 @@ router.post('/scan', async function(req, res, next) {
   }
 
   const data = await performVulnerabilityScan(req.body.url)
+  const links = await followRedirects(req.body.url)
+  console.log(links)
   console.log(data)
-  res.json({data,success:true})
+  res.json({data,finalUrl:links.finalUrl,success:true})
 
 });
 
 /* GET Scrape page. */
 router.post('/scrape', function(req, res, next) {
+
+ 
+
+
   async function scrapeWebsiteDetails(url) {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
+
+   
+  
+  
+    
+
   
     await page.goto(url, { waitUntil: 'networkidle2' });
   
@@ -185,10 +232,10 @@ router.post('/scrape', function(req, res, next) {
   
     return data;
   }
-
   scrapeWebsiteDetails(req.body.url).then(details => {
-    console.log("Data fetched");
-  res.json({data:details, success:true})
+    
+    res.json({data:details, success:true})
+    
 });
 });
 
@@ -222,6 +269,47 @@ router.post('/getAudio', async function(req, res, next) {
       console.error('Error processing your request:', error);
       res.status(500).json({ message: 'Error processing your request' });
   }
+});
+
+
+/* GET END LINKS. */
+router.post('/check-redirects', async (req, res) => {
+  const { url } = req.body;
+
+  async function followRedirects(url, visited = []) {
+    try {
+        const response = await axios.get(url, {
+            maxRedirects: 0, // Disable automatic redirects
+            validateStatus: status => status < 400 // Accept all status codes under 400
+        });
+        // If no redirect, return the final URL and the chain
+        return {
+            finalUrl: response.request.res.responseUrl || url,
+            visited
+        };
+    } catch (error) {
+        if (error.response && (error.response.status === 301 || error.response.status === 302)) {
+            const location = error.response.headers.location;
+            visited.push({
+                url: url,
+                redirectTo: location,
+                status: error.response.status
+            });
+            return followRedirects(location, visited); // Recursively follow redirects
+        } else {
+            // Return the error if it's not a redirect
+            return {
+                error: "Failed to fetch URL",
+                details: error.message,
+                visited
+            };
+        }
+    }
+}
+
+
+  const result = await followRedirects(url);
+  res.json(result);
 });
 
 module.exports = router;
